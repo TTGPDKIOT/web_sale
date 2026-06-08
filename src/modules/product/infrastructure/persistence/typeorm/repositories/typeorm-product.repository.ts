@@ -1,0 +1,48 @@
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Product } from '../../../../domain/entities/product.entity';
+import { ProductRepository } from '../../../../domain/repositories/product.repository';
+import { ProductOrmEntity } from '../entities/product.orm-entity';
+
+@Injectable()
+export class TypeOrmProductRepository implements ProductRepository {
+  constructor(
+    @InjectRepository(ProductOrmEntity)
+    private readonly repo: Repository<ProductOrmEntity>,
+  ) {}
+
+  async findAll(): Promise<Product[]> {
+    const rows = await this.repo.find({ order: { name: 'ASC' } });
+    return rows.map(this.toDomain);
+  }
+
+  async findBySlug(slug: string): Promise<Product | null> {
+    const row = await this.repo.findOne({ where: { slug } });
+    return row ? this.toDomain(row) : null;
+  }
+
+  async save(product: Product): Promise<Product> {
+    const row = this.repo.create(product);
+    const saved = await this.repo.save(row);
+    return this.toDomain(saved);
+  }
+
+  private toDomain(row: ProductOrmEntity): Product {
+    return new Product(
+      row.id,
+      row.name,
+      row.slug,
+      row.sku,
+      Number(row.price),
+      row.originRegionId,
+      row.shortDescription,
+      row.description,
+      row.salePrice !== null && row.salePrice !== undefined ? Number(row.salePrice) : null,
+      row.unit,
+      row.stockQuantity,
+      row.shippingType,
+      row.status,
+    );
+  }
+}
