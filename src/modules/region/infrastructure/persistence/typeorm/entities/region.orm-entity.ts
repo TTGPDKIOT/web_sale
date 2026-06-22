@@ -21,7 +21,7 @@ export class RegionOrmEntity {
   @Column({ name: 'parent_id', type: 'uuid', nullable: true })
   parentId?: string | null;
 
-  @Column({ name: 'image_url', nullable: true })
+  @Column({ name: 'image_url', type: 'text', nullable: true })
   imageUrl?: string | null;
 
   @Column({ type: 'double precision', nullable: true })

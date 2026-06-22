@@ -24,7 +24,7 @@ export class StoryOrmEntity {
   @Column({ name: 'region_id', type: 'uuid', nullable: true })
   regionId?: string | null;
 
-  @Column({ name: 'cover_image_url', nullable: true })
+  @Column({ name: 'cover_image_url', type: 'text', nullable: true })
   coverImageUrl?: string | null;
 
   @Column({ default: 'DRAFT' })

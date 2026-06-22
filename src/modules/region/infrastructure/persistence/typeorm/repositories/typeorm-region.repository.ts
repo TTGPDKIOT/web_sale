@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, DataSource } from 'typeorm';
 import { Region } from '../../../../domain/entities/region.entity';
 import { RegionRepository } from '../../../../domain/repositories/region.repository';
 import { RegionOrmEntity } from '../entities/region.orm-entity';
 
 @Injectable()
 export class TypeOrmRegionRepository implements RegionRepository {
-  constructor(
-    @InjectRepository(RegionOrmEntity)
-    private readonly repo: Repository<RegionOrmEntity>,
-  ) {}
+  private readonly repo: Repository<RegionOrmEntity>;
+
+  constructor(dataSource: DataSource) {
+    this.repo = dataSource.getRepository(RegionOrmEntity);
+  }
 
   async findAll(): Promise<Region[]> {
     const rows = await this.repo.find({ order: { name: 'ASC' } });

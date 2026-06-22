@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, DataSource } from 'typeorm';
 import { Product } from '../../../../domain/entities/product.entity';
 import { ProductRepository } from '../../../../domain/repositories/product.repository';
 import { ProductOrmEntity } from '../entities/product.orm-entity';
 
 @Injectable()
 export class TypeOrmProductRepository implements ProductRepository {
-  constructor(
-    @InjectRepository(ProductOrmEntity)
-    private readonly repo: Repository<ProductOrmEntity>,
-  ) {}
+  private readonly repo: Repository<ProductOrmEntity>;
+
+  constructor(dataSource: DataSource) {
+    this.repo = dataSource.getRepository(ProductOrmEntity);
+  }
 
   async findAll(): Promise<Product[]> {
     const rows = await this.repo.find({ order: { name: 'ASC' } });

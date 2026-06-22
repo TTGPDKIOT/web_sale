@@ -1,20 +1,25 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, DataSource } from 'typeorm';
 import { Story } from '../../../../domain/entities/story.entity';
 import { StoryRepository } from '../../../../domain/repositories/story.repository';
 import { StoryOrmEntity } from '../entities/story.orm-entity';
 
 @Injectable()
 export class TypeOrmStoryRepository implements StoryRepository {
-  constructor(
-    @InjectRepository(StoryOrmEntity)
-    private readonly repo: Repository<StoryOrmEntity>,
-  ) {}
+  private readonly repo: Repository<StoryOrmEntity>;
+
+  constructor(dataSource: DataSource) {
+    this.repo = dataSource.getRepository(StoryOrmEntity);
+  }
 
   async findAll(): Promise<Story[]> {
     const rows = await this.repo.find({ order: { title: 'ASC' } });
     return rows.map(this.toDomain);
+  }
+
+  async findBySlug(slug: string): Promise<Story | null> {
+    const row = await this.repo.findOne({ where: { slug } });
+    return row ? this.toDomain(row) : null;
   }
 
   async save(story: Story): Promise<Story> {
