@@ -13,12 +13,19 @@ export class TypeOrmProductRepository implements ProductRepository {
   }
 
   async findAll(): Promise<Product[]> {
-    const rows = await this.repo.find({ order: { name: 'ASC' } });
+    const rows = await this.repo.find({
+      where: [{ status: 'ACTIVE' }, { status: 'OUT_OF_STOCK' }],
+      relations: { images: true },
+      order: { name: 'ASC' },
+    });
     return rows.map(this.toDomain);
   }
 
   async findBySlug(slug: string): Promise<Product | null> {
-    const row = await this.repo.findOne({ where: { slug } });
+    const row = await this.repo.findOne({
+      where: [{ slug, status: 'ACTIVE' }, { slug, status: 'OUT_OF_STOCK' }],
+      relations: { images: true },
+    });
     return row ? this.toDomain(row) : null;
   }
 
@@ -43,6 +50,22 @@ export class TypeOrmProductRepository implements ProductRepository {
       row.stockQuantity,
       row.shippingType,
       row.status,
+      row.mainImageUrl ?? undefined,
+      row.thumbnailUrl ?? undefined,
+      row.region,
+      row.province,
+      row.productStory,
+      row.ingredients,
+      row.storageInstruction,
+      row.usageInstruction,
+      row.originInfo,
+      row.shippingNote,
+      row.isFeatured,
+      row.isBestSeller,
+      row.isGiftSuitable,
+      row.metaTitle,
+      row.metaDescription,
+      row.metaKeywords,
     );
   }
 }

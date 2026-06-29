@@ -1,6 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
-import { CreateProductDto } from '../../application/dtos/create-product.dto';
-import { CreateProductUseCase } from '../../application/use-cases/create-product.use-case';
+import { Controller, Get, Param } from '@nestjs/common';
 import { GetProductBySlugUseCase } from '../../application/use-cases/get-product-by-slug.use-case';
 import { GetProductsUseCase } from '../../application/use-cases/get-products.use-case';
 
@@ -9,7 +7,6 @@ export class ProductController {
   constructor(
     private readonly getProductsUseCase: GetProductsUseCase,
     private readonly getProductBySlugUseCase: GetProductBySlugUseCase,
-    private readonly createProductUseCase: CreateProductUseCase,
   ) {}
 
   @Get()
@@ -22,8 +19,4 @@ export class ProductController {
     return this.getProductBySlugUseCase.execute(slug);
   }
 
-  @Post()
-  create(@Body() dto: CreateProductDto) {
-    return this.createProductUseCase.execute(dto);
-  }
 }
